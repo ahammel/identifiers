@@ -1,0 +1,12 @@
+[package]
+name = "identifiers"
+version = "0.1.0"
+edition = "2021"
+description = "Type safe identifiers in Rust"
+license = "MIT"
+repository = "https://github.com/ahammel/identifiers"
+readme = "README.md"
+keywords = []
+categories = []
+
+[dependencies]
