@@ -415,9 +415,52 @@ fn derive_integer_identifier_inner(input: &DeriveInput) -> Result<TokenStream2, 
 
     let from_impl = if all {
         quote! {
+            impl ::std::convert::From<u8> for #name {
+                fn from(n: u8) -> Self { Self(n as u64) }
+            }
+            impl ::std::convert::From<u16> for #name {
+                fn from(n: u16) -> Self { Self(n as u64) }
+            }
+            impl ::std::convert::From<u32> for #name {
+                fn from(n: u32) -> Self { Self(n as u64) }
+            }
             impl ::std::convert::From<u64> for #name {
-                fn from(n: u64) -> Self {
-                    Self(n)
+                fn from(n: u64) -> Self { Self(n) }
+            }
+            impl ::std::convert::TryFrom<u128> for #name {
+                type Error = ::std::num::TryFromIntError;
+                fn try_from(n: u128) -> ::std::result::Result<Self, Self::Error> {
+                    ::std::result::Result::Ok(Self(u64::try_from(n)?))
+                }
+            }
+            impl ::std::convert::TryFrom<i8> for #name {
+                type Error = ::std::num::TryFromIntError;
+                fn try_from(n: i8) -> ::std::result::Result<Self, Self::Error> {
+                    ::std::result::Result::Ok(Self(u64::try_from(n)?))
+                }
+            }
+            impl ::std::convert::TryFrom<i16> for #name {
+                type Error = ::std::num::TryFromIntError;
+                fn try_from(n: i16) -> ::std::result::Result<Self, Self::Error> {
+                    ::std::result::Result::Ok(Self(u64::try_from(n)?))
+                }
+            }
+            impl ::std::convert::TryFrom<i32> for #name {
+                type Error = ::std::num::TryFromIntError;
+                fn try_from(n: i32) -> ::std::result::Result<Self, Self::Error> {
+                    ::std::result::Result::Ok(Self(u64::try_from(n)?))
+                }
+            }
+            impl ::std::convert::TryFrom<i64> for #name {
+                type Error = ::std::num::TryFromIntError;
+                fn try_from(n: i64) -> ::std::result::Result<Self, Self::Error> {
+                    ::std::result::Result::Ok(Self(u64::try_from(n)?))
+                }
+            }
+            impl ::std::convert::TryFrom<i128> for #name {
+                type Error = ::std::num::TryFromIntError;
+                fn try_from(n: i128) -> ::std::result::Result<Self, Self::Error> {
+                    ::std::result::Result::Ok(Self(u64::try_from(n)?))
                 }
             }
         }

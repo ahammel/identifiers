@@ -103,15 +103,58 @@ fn integer_identifier_zero() {
 
 #[test]
 fn integer_identifier_roundtrips() {
-    assert_eq!(TestIntId::from(42).as_u64(), 42);
+    assert_eq!(TestIntId::from(42u64).as_u64(), 42);
 }
 
 #[test]
 fn integer_identifier_ordering() {
-    assert!(TestIntId::from(1) < TestIntId::from(2));
+    assert!(TestIntId::from(1u64) < TestIntId::from(2u64));
 }
 
 #[test]
 fn integer_identifier_debug() {
-    assert_eq!(format!("{:?}", TestIntId::from(42)), "TestIntId(42)");
+    assert_eq!(format!("{:?}", TestIntId::from(42u64)), "TestIntId(42)");
+}
+
+#[test]
+fn integer_identifier_from_u8() {
+    assert_eq!(TestIntId::from(255u8).as_u64(), 255);
+}
+
+#[test]
+fn integer_identifier_from_u16() {
+    assert_eq!(TestIntId::from(1000u16).as_u64(), 1000);
+}
+
+#[test]
+fn integer_identifier_from_u32() {
+    assert_eq!(TestIntId::from(u32::MAX).as_u64(), u32::MAX as u64);
+}
+
+#[test]
+fn integer_identifier_try_from_u128_ok() {
+    assert_eq!(TestIntId::try_from(42u128).unwrap().as_u64(), 42);
+}
+
+#[test]
+fn integer_identifier_try_from_u128_overflow() {
+    assert!(TestIntId::try_from(u128::MAX).is_err());
+}
+
+#[test]
+fn integer_identifier_try_from_signed_ok() {
+    assert_eq!(TestIntId::try_from(1i8).unwrap().as_u64(), 1);
+    assert_eq!(TestIntId::try_from(1i16).unwrap().as_u64(), 1);
+    assert_eq!(TestIntId::try_from(1i32).unwrap().as_u64(), 1);
+    assert_eq!(TestIntId::try_from(1i64).unwrap().as_u64(), 1);
+    assert_eq!(TestIntId::try_from(1i128).unwrap().as_u64(), 1);
+}
+
+#[test]
+fn integer_identifier_try_from_signed_negative() {
+    assert!(TestIntId::try_from(-1i8).is_err());
+    assert!(TestIntId::try_from(-1i16).is_err());
+    assert!(TestIntId::try_from(-1i32).is_err());
+    assert!(TestIntId::try_from(-1i64).is_err());
+    assert!(TestIntId::try_from(-1i128).is_err());
 }

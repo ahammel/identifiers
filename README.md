@@ -160,18 +160,28 @@ pub struct InvoiceNumber(u64);
 
 The derive macro implements `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`,
 `Hash`, `PartialOrd`, and `Ord`. With `#[allowed_values(all)]` it also derives
-`From<u64>` and an `IntegerIdentifier` impl.
+an `IntegerIdentifier` impl and the following conversions:
+
+| Source type | Impl | Fails when |
+|-------------|------|------------|
+| `u8`, `u16`, `u32`, `u64` | `From` | — |
+| `u128` | `TryFrom` | value exceeds `u64::MAX` |
+| `i8`, `i16`, `i32`, `i64`, `i128` | `TryFrom` | value is negative |
 
 ```rust
-let n = InvoiceNumber::from(1042);
+let n = InvoiceNumber::from(1042u64);
 assert_eq!(n.as_u64(), 1042);
-assert!(InvoiceNumber::from(1) < InvoiceNumber::from(2));
+assert!(InvoiceNumber::from(1u64) < InvoiceNumber::from(2u64));
+
+// Fallible conversion from wider or signed types:
+assert!(InvoiceNumber::try_from(u128::MAX).is_err());
+assert!(InvoiceNumber::try_from(-1i64).is_err());
 
 // Zero value (useful as a sentinel or default floor):
 let start = InvoiceNumber::zero();
 ```
 
-Without the attribute, no `From` is derived; supply your own `From`/`TryFrom`
+Without the attribute, no conversions are derived; supply your own `From`/`TryFrom`
 and `IntegerIdentifier` impl.
 
 ### UUID identifiers

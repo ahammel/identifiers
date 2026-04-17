@@ -20,6 +20,15 @@ note: tuple struct defined here
   |        ^^^^^
   = note: this error originates in the derive macro `IntegerIdentifier` (in Nightly builds, run with -Z macro-backtrace for more info)
 
+error[E0308]: `?` operator has incompatible types
+ --> tests/ui/integer_wrong_type.rs:3:10
+  |
+3 | #[derive(IntegerIdentifier)]
+  |          ^^^^^^^^^^^^^^^^^ expected `String`, found `u64`
+  |
+  = note: `?` operator cannot convert from `u64` to `String`
+  = note: this error originates in the derive macro `IntegerIdentifier` (in Nightly builds, run with -Z macro-backtrace for more info)
+
 error[E0308]: mismatched types
  --> tests/ui/integer_wrong_type.rs:3:10
   |
