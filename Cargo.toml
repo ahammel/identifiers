@@ -6,8 +6,8 @@ description = "Type safe identifiers in Rust"
 license = "MIT"
 repository = "https://github.com/ahammel/identifiers"
 readme = "README.md"
-keywords = []
-categories = []
+keywords = ["identifier", "newtype", "typesafe", "derive"]
+categories = ["rust-patterns"]
 
 [workspace]
 members = ["identifiers-derive", "identifiers-uuid", "identifiers-uri"]

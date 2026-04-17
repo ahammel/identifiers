@@ -5,6 +5,9 @@ edition = "2021"
 description = "UriIdentifier trait and derive macro"
 license = "MIT"
 repository = "https://github.com/ahammel/identifiers"
+readme = "../README.md"
+keywords = ["identifier", "newtype", "typesafe", "derive", "uri"]
+categories = ["rust-patterns"]
 
 [dependencies]
 fluent-uri = "0.4.1"

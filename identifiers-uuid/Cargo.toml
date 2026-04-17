@@ -5,6 +5,9 @@ edition = "2021"
 description = "UuidIdentifier trait and derive macro"
 license = "MIT"
 repository = "https://github.com/ahammel/identifiers"
+readme = "../README.md"
+keywords = ["identifier", "newtype", "typesafe", "derive", "uuid"]
+categories = ["rust-patterns"]
 
 [dependencies]
 identifiers-derive = { path = "../identifiers-derive", version = "0.1.0" }

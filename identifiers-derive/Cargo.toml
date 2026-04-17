@@ -5,6 +5,9 @@ edition = "2021"
 description = "Derive macros for the identifiers crate"
 license = "MIT"
 repository = "https://github.com/ahammel/identifiers"
+readme = "../README.md"
+keywords = ["identifier", "newtype", "typesafe", "derive"]
+categories = ["rust-patterns"]
 
 [lib]
 proc-macro = true
