@@ -3,7 +3,7 @@ use std::hash::Hash;
 
 pub use identifiers_derive::{IntegerIdentifier, StringIdentifier};
 
-/// Error returned when a [`StringIdentifier`] with `#[validate(non_empty)]` is constructed
+/// Error returned when a [`StringIdentifier`] with `#[allowed_values(non_empty)]` is constructed
 /// from an empty string.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EmptyError;
@@ -16,7 +16,7 @@ impl std::fmt::Display for EmptyError {
 
 impl std::error::Error for EmptyError {}
 
-/// Error returned when a [`StringIdentifier`] with `#[validate(non_blank)]` is constructed
+/// Error returned when a [`StringIdentifier`] with `#[allowed_values(non_blank)]` is constructed
 /// from a blank string (empty or all whitespace).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BlankError;
@@ -96,9 +96,37 @@ pub trait StringIdentifier: Debug + Clone + PartialEq + Eq + Hash + AsRef<str> {
     type Error: std::error::Error;
 
     /// Validates `s` before it is wrapped. Return `Err` to reject the string.
+    ///
+    /// Called automatically by the derived `From`/`TryFrom` conversion impls.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use identifiers::{StringIdentifier, EmptyError};
+    ///
+    /// #[derive(StringIdentifier)]
+    /// #[allowed_values(non_empty)]
+    /// struct UserId(String);
+    ///
+    /// assert!(UserId::validate("alice").is_ok());
+    /// assert_eq!(UserId::validate(""), Err(EmptyError));
+    /// ```
     fn validate(s: &str) -> Result<(), Self::Error>;
 
     /// Returns the underlying string slice.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use identifiers::StringIdentifier;
+    ///
+    /// #[derive(StringIdentifier)]
+    /// #[allowed_values(all)]
+    /// struct UserId(String);
+    ///
+    /// let id = UserId::from("alice".to_string());
+    /// assert_eq!(id.as_str(), "alice");
+    /// ```
     fn as_str(&self) -> &str {
         self.as_ref()
     }
@@ -107,6 +135,20 @@ pub trait StringIdentifier: Debug + Clone + PartialEq + Eq + Hash + AsRef<str> {
 /// Common interface for typed `u64` wrappers used as identifiers or sequence positions.
 ///
 /// Implies [`Ord`] and [`PartialOrd`]; implementors must derive or implement those traits.
+///
+/// # Examples
+///
+/// ```rust
+/// use identifiers::IntegerIdentifier;
+///
+/// #[derive(IntegerIdentifier)]
+/// #[allowed_values(all)]
+/// struct InvoiceId(u64);
+///
+/// let id = InvoiceId::new(1042);
+/// assert_eq!(id.as_u64(), 1042);
+/// assert!(InvoiceId::zero() < id);
+/// ```
 pub trait IntegerIdentifier:
     Debug + Clone + Copy + PartialEq + Eq + Hash + Ord + PartialOrd
 {
@@ -114,11 +156,50 @@ pub trait IntegerIdentifier:
     type Error: std::error::Error;
 
     /// Validates `n` before it is wrapped. Return `Err` to reject it.
+    ///
+    /// Called automatically by the derived `From`/`TryFrom` conversion impls.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use identifiers::IntegerIdentifier;
+    ///
+    /// #[derive(IntegerIdentifier)]
+    /// #[allowed_values(all)]
+    /// struct InvoiceId(u64);
+    ///
+    /// assert!(InvoiceId::validate(42).is_ok());
+    /// ```
     fn validate(n: u64) -> Result<(), Self::Error>;
 
     /// Returns an instance initialised to zero (the smallest valid value).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use identifiers::IntegerIdentifier;
+    ///
+    /// #[derive(IntegerIdentifier)]
+    /// #[allowed_values(all)]
+    /// struct InvoiceId(u64);
+    ///
+    /// assert_eq!(InvoiceId::zero().as_u64(), 0);
+    /// assert!(InvoiceId::zero() <= InvoiceId::new(1));
+    /// ```
     fn zero() -> Self;
 
     /// Returns the underlying `u64`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use identifiers::IntegerIdentifier;
+    ///
+    /// #[derive(IntegerIdentifier)]
+    /// #[allowed_values(all)]
+    /// struct InvoiceId(u64);
+    ///
+    /// assert_eq!(InvoiceId::new(42).as_u64(), 42);
+    /// ```
     fn as_u64(&self) -> u64;
 }

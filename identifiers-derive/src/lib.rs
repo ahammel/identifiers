@@ -1,3 +1,10 @@
+//! Derive macros for the `identifiers` crate family.
+//!
+//! This is a proc-macro implementation crate. In most cases you should add
+//! [`identifiers`](https://docs.rs/identifiers), [`identifiers-uuid`](https://docs.rs/identifiers-uuid),
+//! or [`identifiers-uri`](https://docs.rs/identifiers-uri) as your dependency
+//! rather than this crate directly.
+
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
