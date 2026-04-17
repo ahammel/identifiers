@@ -1,7 +1,7 @@
 error[E0204]: the trait `Copy` cannot be implemented for this type
- --> tests/ui/integer_wrong_type.rs:4:8
+ --> tests/ui/integer_wrong_type.rs:5:8
   |
-4 | struct BadId(String);
+5 | struct BadId(String);
   |        ^^^^^ ------ this field does not implement `Copy`
 
 error[E0308]: mismatched types
@@ -14,9 +14,9 @@ error[E0308]: mismatched types
   |          arguments to this function are incorrect
   |
 note: tuple struct defined here
- --> tests/ui/integer_wrong_type.rs:4:8
+ --> tests/ui/integer_wrong_type.rs:5:8
   |
-4 | struct BadId(String);
+5 | struct BadId(String);
   |        ^^^^^
   = note: this error originates in the derive macro `IntegerIdentifier` (in Nightly builds, run with -Z macro-backtrace for more info)
 
@@ -30,9 +30,9 @@ error[E0308]: mismatched types
   |          arguments to this function are incorrect
   |
 note: tuple struct defined here
- --> tests/ui/integer_wrong_type.rs:4:8
+ --> tests/ui/integer_wrong_type.rs:5:8
   |
-4 | struct BadId(String);
+5 | struct BadId(String);
   |        ^^^^^
   = note: this error originates in the derive macro `IntegerIdentifier` (in Nightly builds, run with -Z macro-backtrace for more info)
 

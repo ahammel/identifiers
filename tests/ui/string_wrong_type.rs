@@ -1,7 +1,7 @@
 use identifiers::StringIdentifier;
 
 #[derive(StringIdentifier)]
-#[validate(non_empty)]
+#[allowed_values(non_empty)]
 struct BadId(u64);
 
 fn main() {}

@@ -1,18 +1,19 @@
 use identifiers::{BlankError, EmptyError, IntegerIdentifier, StringIdentifier};
 
 #[derive(StringIdentifier)]
-#[validate(non_empty)]
+#[allowed_values(non_empty)]
 struct NonEmptyId(String);
 
 #[derive(StringIdentifier)]
-#[validate(non_blank)]
+#[allowed_values(non_blank)]
 struct NonBlankId(String);
 
 #[derive(StringIdentifier)]
-#[validate(any)]
-struct AnyId(String);
+#[allowed_values(all)]
+struct AllId(String);
 
 #[derive(IntegerIdentifier)]
+#[allowed_values(all)]
 struct TestIntId(u64);
 
 // --- non_empty ---
@@ -70,30 +71,27 @@ fn non_blank_debug() {
     assert_eq!(format!("{:?}", id), r#"NonBlankId("hello")"#);
 }
 
-// --- any ---
+// --- all ---
 
 #[test]
-fn any_accepts_nonempty_string() {
-    assert_eq!(
-        AnyId::try_from("hello".to_string()).unwrap().as_str(),
-        "hello",
-    );
+fn all_accepts_nonempty_string() {
+    assert_eq!(AllId::from("hello".to_string()).as_str(), "hello");
 }
 
 #[test]
-fn any_accepts_empty_string() {
-    assert!(AnyId::try_from(String::new()).is_ok());
+fn all_accepts_empty_string() {
+    let _ = AllId::from(String::new());
 }
 
 #[test]
-fn any_accepts_blank_string() {
-    assert!(AnyId::try_from("   ".to_string()).is_ok());
+fn all_accepts_blank_string() {
+    let _ = AllId::from("   ".to_string());
 }
 
 #[test]
-fn any_debug() {
-    let id = AnyId::try_from("hello".to_string()).unwrap();
-    assert_eq!(format!("{:?}", id), r#"AnyId("hello")"#);
+fn all_debug() {
+    let id = AllId::from("hello".to_string());
+    assert_eq!(format!("{:?}", id), r#"AllId("hello")"#);
 }
 
 // --- integer ---
@@ -105,18 +103,15 @@ fn integer_identifier_zero() {
 
 #[test]
 fn integer_identifier_roundtrips() {
-    assert_eq!(TestIntId::try_from(42).unwrap().as_u64(), 42);
+    assert_eq!(TestIntId::from(42).as_u64(), 42);
 }
 
 #[test]
 fn integer_identifier_ordering() {
-    assert!(TestIntId::try_from(1).unwrap() < TestIntId::try_from(2).unwrap());
+    assert!(TestIntId::from(1) < TestIntId::from(2));
 }
 
 #[test]
 fn integer_identifier_debug() {
-    assert_eq!(
-        format!("{:?}", TestIntId::try_from(42).unwrap()),
-        "TestIntId(42)"
-    );
+    assert_eq!(format!("{:?}", TestIntId::from(42)), "TestIntId(42)");
 }

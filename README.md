@@ -64,15 +64,15 @@ This library generates the same code from two lines:
 use identifiers::StringIdentifier;
 
 #[derive(StringIdentifier)]
-#[validate(non_empty)]
+#[allowed_values(non_empty)]
 pub struct UserId(String);
 
 #[derive(StringIdentifier)]
-#[validate(non_empty)]
+#[allowed_values(non_empty)]
 pub struct PostId(String);
 
 #[derive(StringIdentifier)]
-#[validate(non_empty)]
+#[allowed_values(non_empty)]
 pub struct OrgId(String);
 
 fn transfer_post(
@@ -105,58 +105,48 @@ identifiers-uri  = "0.1"
 
 ### String identifiers
 
-```rust
-use identifiers::StringIdentifier;
+The derive macro always implements `Debug`, `Clone`, `PartialEq`, `Eq`, `Hash`,
+and `AsRef<str>`. The `#[allowed_values(...)]` attribute controls what
+construction impl is generated.
 
+**`#[allowed_values(all)]`** — derives `From<String>`, accepts any string:
+
+```rust
 #[derive(StringIdentifier)]
-#[validate(non_empty)]
+#[allowed_values(all)]
+pub struct Tag(String);
+
+let tag = Tag::from("rust".to_string());
+assert_eq!(tag.as_str(), "rust");
+```
+
+**`#[allowed_values(non_empty)]`** — derives `TryFrom<String>`, rejects empty strings:
+
+```rust
+#[derive(StringIdentifier)]
+#[allowed_values(non_empty)]
 pub struct UserId(String);
+
+assert!(UserId::try_from("u_abc123".to_string()).is_ok());
+assert_eq!(UserId::try_from(String::new()).unwrap_err(), EmptyError);
 ```
 
-Construct via `TryFrom<String>`; validation runs at construction time:
+**`#[allowed_values(non_blank)]`** — derives `TryFrom<String>`, rejects empty and
+whitespace-only strings:
 
 ```rust
-let id = UserId::try_from("u_abc123".to_string())?;
-assert_eq!(id.as_str(), "u_abc123");
-
-// Debug output includes the type name:
-// UserId("u_abc123")
-```
-
-The derive macro implements `Debug`, `Clone`, `PartialEq`, `Eq`, `Hash`,
-`AsRef<str>`, `TryFrom<String>`, and `StringIdentifier`.
-
-#### Validation options
-
-| Attribute | Behaviour | Error type |
-|-----------|-----------|------------|
-| `#[validate(non_empty)]` | Rejects empty strings | `EmptyError` |
-| `#[validate(non_blank)]` | Rejects empty and whitespace-only strings | `BlankError` |
-| `#[validate(any)]` | Accepts all strings | `Infallible` |
-| `#[validate(custom)]` or no attribute | User supplies `validate` | user-defined |
-
-For custom validation, implement `StringIdentifier` manually; the derive still
-generates all the boilerplate and `TryFrom<String>`:
-
-```rust
-use identifiers::StringIdentifier;
-
 #[derive(StringIdentifier)]
-#[validate(custom)]
-pub struct Slug(String);
+#[allowed_values(non_blank)]
+pub struct DisplayName(String);
 
-impl StringIdentifier for Slug {
-    type Error = SlugError;
-
-    fn validate(s: &str) -> Result<(), SlugError> {
-        if s.chars().all(|c| c.is_ascii_alphanumeric() || c == '-') {
-            Ok(())
-        } else {
-            Err(SlugError)
-        }
-    }
-}
+assert!(DisplayName::try_from("Alice".to_string()).is_ok());
+assert_eq!(DisplayName::try_from(String::new()).unwrap_err(), BlankError);
+assert_eq!(DisplayName::try_from("   ".to_string()).unwrap_err(), BlankError);
 ```
+
+**No attribute** — no conversion impl is derived; supply your own `From`/`TryFrom`
+if desired. The `StringIdentifier` impl is still generated (with infallible
+validation).
 
 ### Integer identifiers
 
@@ -164,24 +154,25 @@ impl StringIdentifier for Slug {
 use identifiers::IntegerIdentifier;
 
 #[derive(IntegerIdentifier)]
+#[allowed_values(all)]
 pub struct InvoiceNumber(u64);
 ```
 
 The derive macro implements `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`,
-`Hash`, `PartialOrd`, `Ord`, `TryFrom<u64>`, and `IntegerIdentifier` with
-infallible validation (accepts all `u64` values).
+`Hash`, `PartialOrd`, and `Ord`. With `#[allowed_values(all)]` it also derives
+`From<u64>` and an `IntegerIdentifier` impl.
 
 ```rust
-let n = InvoiceNumber::try_from(1042).unwrap();
+let n = InvoiceNumber::from(1042);
 assert_eq!(n.as_u64(), 1042);
-assert!(InvoiceNumber::try_from(1).unwrap() < InvoiceNumber::try_from(2).unwrap());
+assert!(InvoiceNumber::from(1) < InvoiceNumber::from(2));
 
 // Zero value (useful as a sentinel or default floor):
 let start = InvoiceNumber::zero();
 ```
 
-Add `#[validate(custom)]` to supply your own `IntegerIdentifier` impl instead.
-`#[validate(all)]` is an explicit alias for the default infallible behaviour.
+Without the attribute, no `From` is derived; supply your own `From`/`TryFrom`
+and `IntegerIdentifier` impl.
 
 ### UUID identifiers
 
@@ -194,24 +185,20 @@ identifiers-uuid = "0.1"
 use identifiers_uuid::UuidIdentifier;
 
 #[derive(UuidIdentifier)]
+#[allowed_values(all)]
 pub struct SessionId(Uuid);
 ```
 
-The derive macro implements `Debug`, `Clone`, `Copy`, `PartialEq`, `Eq`,
-`Hash`, `TryFrom<Uuid>`, and `UuidIdentifier` with infallible validation.
-`SessionId::new()` generates a random v4 UUID.
+With `#[allowed_values(all)]`, also derives `From<Uuid>` and a
+`UuidIdentifier` impl. `SessionId::new()` generates a random v4 UUID.
 
 ```rust
 let id = SessionId::new();
 assert_ne!(id, SessionId::new()); // each call produces a unique value
 
-let uuid = id.as_uuid();
-let roundtripped = SessionId::try_from(uuid).unwrap();
+let roundtripped = SessionId::from(id.as_uuid());
 assert_eq!(id, roundtripped);
 ```
-
-Add `#[validate(custom)]` to supply your own `UuidIdentifier` impl instead.
-`#[validate(all)]` is an explicit alias for the default infallible behaviour.
 
 ### URI identifiers
 
@@ -225,20 +212,18 @@ use fluent_uri::Uri;
 use identifiers_uri::UriIdentifier;
 
 #[derive(UriIdentifier)]
+#[allowed_values(all)]
 pub struct ResourceUri(Uri<String>);
 ```
 
-The derive macro implements `Debug`, `Clone`, `PartialEq`, `Eq`, `Hash`,
-`TryFrom<Uri<String>>`, and `UriIdentifier` with infallible validation.
+With `#[allowed_values(all)]`, also derives `From<Uri<String>>` and a
+`UriIdentifier` impl.
 
 ```rust
 let uri = Uri::<String>::parse("https://example.com/resources/42".to_string()).unwrap();
-let id = ResourceUri::try_from(uri).unwrap();
+let id = ResourceUri::from(uri);
 assert_eq!(id.as_uri().as_str(), "https://example.com/resources/42");
 ```
-
-Add `#[validate(custom)]` to supply your own `UriIdentifier` impl instead.
-`#[validate(all)]` is an explicit alias for the default infallible behaviour.
 
 ## Using identifiers as map keys
 
@@ -250,7 +235,7 @@ use std::collections::HashMap;
 use identifiers::StringIdentifier;
 
 #[derive(StringIdentifier)]
-#[validate(non_empty)]
+#[allowed_values(non_empty)]
 pub struct UserId(String);
 
 let mut scores: HashMap<UserId, u32> = HashMap::new();
@@ -266,12 +251,11 @@ compile error:
 ```rust
 // error: expected a newtype struct with exactly one unnamed field
 #[derive(StringIdentifier)]
-#[validate(any)]
 struct Bad { id: String }
 
 // error[E0308]: mismatched types
 #[derive(StringIdentifier)]
-#[validate(any)]
+#[allowed_values(non_empty)]
 struct AlsoBad(u64);
 ```
 

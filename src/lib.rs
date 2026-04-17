@@ -31,18 +31,13 @@ impl std::error::Error for BlankError {}
 
 /// Common interface for typed string wrappers used as identifiers.
 ///
-/// Construct instances via [`TryFrom<String>`]; the `validate` method is called automatically
-/// at construction time. Use the `#[derive(StringIdentifier)]` macro with a `#[validate(...)]`
-/// attribute to generate the implementation:
+/// Use `#[derive(StringIdentifier)]` to generate the implementation. The derive always emits
+/// the boilerplate (`Debug`, `Clone`, etc.) and the `StringIdentifier` impl. Add an
+/// `#[allowed_values(...)]` attribute to also derive a conversion impl:
 ///
-/// - `#[validate(non_empty)]` — rejects empty strings; error type is [`EmptyError`]
-/// - `#[validate(non_blank)]` — rejects blank strings (empty or all whitespace); error type
-///   is [`BlankError`]
-/// - `#[validate(any)]` — accepts all strings; error type is [`Infallible`](std::convert::Infallible)
-///
-/// For custom validation, use `#[validate(custom)]` or omit the attribute entirely, then
-/// implement `validate` and `as_str` manually; the derive will still generate the boilerplate
-/// (`Debug`, `Clone`, etc.) and the `TryFrom<String>` impl.
+/// - `#[allowed_values(all)]` — derives `From<String>`
+/// - `#[allowed_values(non_empty)]` — derives `TryFrom<String>`, rejects empty strings
+/// - `#[allowed_values(non_blank)]` — derives `TryFrom<String>`, rejects blank strings
 pub trait StringIdentifier: Debug + Clone + PartialEq + Eq + Hash + AsRef<str> {
     /// The error type returned when validation fails.
     type Error: std::error::Error;
