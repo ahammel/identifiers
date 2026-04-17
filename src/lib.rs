@@ -29,6 +29,59 @@ impl std::fmt::Display for BlankError {
 
 impl std::error::Error for BlankError {}
 
+/// Returns `Ok(())` if `s` is non-empty, or [`EmptyError`] otherwise.
+///
+/// Intended for use inside custom [`StringIdentifier::validate`] implementations:
+///
+/// ```rust
+/// # use identifiers::{StringIdentifier, EmptyError, require_non_empty};
+/// # #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+/// # struct MyId(String);
+/// # impl AsRef<str> for MyId { fn as_ref(&self) -> &str { &self.0 } }
+/// # impl StringIdentifier for MyId {
+/// #     type Error = EmptyError;
+///     fn validate(s: &str) -> Result<(), EmptyError> {
+///         require_non_empty(s)?;
+///         // additional checks …
+///         Ok(())
+///     }
+/// # }
+/// ```
+pub fn require_non_empty(s: &str) -> Result<(), EmptyError> {
+    if s.is_empty() {
+        Err(EmptyError)
+    } else {
+        Ok(())
+    }
+}
+
+/// Returns `Ok(())` if `s` is non-blank (contains at least one non-whitespace character),
+/// or [`BlankError`] otherwise.
+///
+/// Intended for use inside custom [`StringIdentifier::validate`] implementations:
+///
+/// ```rust
+/// # use identifiers::{StringIdentifier, BlankError, require_non_blank};
+/// # #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+/// # struct MyId(String);
+/// # impl AsRef<str> for MyId { fn as_ref(&self) -> &str { &self.0 } }
+/// # impl StringIdentifier for MyId {
+/// #     type Error = BlankError;
+///     fn validate(s: &str) -> Result<(), BlankError> {
+///         require_non_blank(s)?;
+///         // additional checks …
+///         Ok(())
+///     }
+/// # }
+/// ```
+pub fn require_non_blank(s: &str) -> Result<(), BlankError> {
+    if s.trim().is_empty() {
+        Err(BlankError)
+    } else {
+        Ok(())
+    }
+}
+
 /// Common interface for typed string wrappers used as identifiers.
 ///
 /// Use `#[derive(StringIdentifier)]` to generate the implementation. The derive always emits

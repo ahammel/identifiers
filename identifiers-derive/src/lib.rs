@@ -227,23 +227,11 @@ fn derive_string_identifier_inner(input: &DeriveInput) -> Result<TokenStream2, E
         ),
         Some(AllowedValues::NonEmpty) => (
             quote! { ::identifiers::EmptyError },
-            quote! {
-                if s.is_empty() {
-                    ::std::result::Result::Err(::identifiers::EmptyError)
-                } else {
-                    ::std::result::Result::Ok(())
-                }
-            },
+            quote! { ::identifiers::require_non_empty(s) },
         ),
         Some(AllowedValues::NonBlank) => (
             quote! { ::identifiers::BlankError },
-            quote! {
-                if s.trim().is_empty() {
-                    ::std::result::Result::Err(::identifiers::BlankError)
-                } else {
-                    ::std::result::Result::Ok(())
-                }
-            },
+            quote! { ::identifiers::require_non_blank(s) },
         ),
     };
 
