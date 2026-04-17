@@ -11,7 +11,13 @@ pub mod __private {
 }
 
 /// Common interface for typed UUID wrappers.
-pub trait UuidIdentifier: Debug + Clone + Copy + PartialEq + Eq + Hash + From<Uuid> {
+pub trait UuidIdentifier: Debug + Clone + Copy + PartialEq + Eq + Hash {
+    /// The error type returned when validation fails.
+    type Error: std::error::Error;
+
+    /// Validates `uuid` before it is wrapped. Return `Err` to reject it.
+    fn validate(uuid: &Uuid) -> Result<(), Self::Error>;
+
     /// Generates a new random identifier.
     fn new() -> Self;
 

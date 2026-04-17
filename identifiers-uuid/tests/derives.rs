@@ -17,14 +17,14 @@ fn uuid_identifier_new_is_unique() {
 #[test]
 fn uuid_identifier_roundtrips() {
     let uuid = Uuid::new_v4();
-    assert_eq!(TestUuidId::from(uuid).as_uuid(), uuid);
+    assert_eq!(TestUuidId::try_from(uuid).unwrap().as_uuid(), uuid);
 }
 
 #[test]
 fn uuid_identifier_debug() {
     let uuid = Uuid::parse_str("550e8400-e29b-41d4-a716-446655440000").unwrap();
     assert_eq!(
-        format!("{:?}", TestUuidId::from(uuid)),
+        format!("{:?}", TestUuidId::try_from(uuid).unwrap()),
         "TestUuidId(550e8400-e29b-41d4-a716-446655440000)",
     );
 }

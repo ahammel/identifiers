@@ -11,7 +11,13 @@ pub mod __private {
 }
 
 /// Common interface for typed URI wrappers.
-pub trait UriIdentifier: Debug + Clone + PartialEq + Eq + Hash + From<Uri<String>> {
+pub trait UriIdentifier: Debug + Clone + PartialEq + Eq + Hash {
+    /// The error type returned when validation fails.
+    type Error: std::error::Error;
+
+    /// Validates `uri` before it is wrapped. Return `Err` to reject it.
+    fn validate(uri: &Uri<String>) -> Result<(), Self::Error>;
+
     /// Returns the underlying [`Uri`].
     fn as_uri(&self) -> &Uri<String>;
 }

@@ -1,5 +1,5 @@
+use fluent_uri::Uri;
 use identifiers_uri::UriIdentifier;
-use identifiers_uri::__private::fluent_uri::Uri;
 
 #[derive(UriIdentifier)]
 struct TestUriId(Uri<String>);
@@ -8,7 +8,7 @@ struct TestUriId(Uri<String>);
 fn uri_identifier_roundtrips() {
     let uri = Uri::<String>::parse("https://example.com/foo".to_string()).unwrap();
     assert_eq!(
-        TestUriId::from(uri).as_uri().as_str(),
+        TestUriId::try_from(uri).unwrap().as_uri().as_str(),
         "https://example.com/foo"
     );
 }
@@ -17,7 +17,7 @@ fn uri_identifier_roundtrips() {
 fn uri_identifier_debug() {
     let uri = Uri::<String>::parse("https://example.com/foo".to_string()).unwrap();
     assert_eq!(
-        format!("{:?}", TestUriId::from(uri)),
+        format!("{:?}", TestUriId::try_from(uri).unwrap()),
         r#"TestUriId("https://example.com/foo")"#,
     );
 }
