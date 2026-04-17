@@ -1,0 +1,7 @@
+error: expected a newtype struct with exactly one unnamed field
+ --> tests/ui/uuid_not_newtype.rs:4:1
+  |
+4 | / struct BadId {
+5 | |     id: String,
+6 | | }
+  | |_^
