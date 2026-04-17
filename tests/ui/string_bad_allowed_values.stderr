@@ -1,0 +1,5 @@
+error: expected `all`, `non_empty`, or `non_blank`
+ --> tests/ui/string_bad_allowed_values.rs:4:18
+  |
+4 | #[allowed_values(typo)]
+  |                  ^^^^
