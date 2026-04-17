@@ -102,6 +102,11 @@ fn integer_identifier_zero() {
 }
 
 #[test]
+fn integer_identifier_new() {
+    assert_eq!(TestIntId::new(42).as_u64(), 42);
+}
+
+#[test]
 fn integer_identifier_roundtrips() {
     assert_eq!(TestIntId::from(42u64).as_u64(), 42);
 }

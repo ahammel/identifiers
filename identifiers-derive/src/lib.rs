@@ -415,6 +415,11 @@ fn derive_integer_identifier_inner(input: &DeriveInput) -> Result<TokenStream2, 
 
     let from_impl = if all {
         quote! {
+            impl #name {
+                /// Constructs a new instance from a `u64` value.
+                pub fn new(n: u64) -> Self { Self(n) }
+            }
+
             impl ::std::convert::From<u8> for #name {
                 fn from(n: u8) -> Self { Self(n as u64) }
             }

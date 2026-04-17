@@ -169,9 +169,9 @@ an `IntegerIdentifier` impl and the following conversions:
 | `i8`, `i16`, `i32`, `i64`, `i128` | `TryFrom` | value is negative |
 
 ```rust
-let n = InvoiceNumber::from(1042u64);
+let n = InvoiceNumber::new(1042);
 assert_eq!(n.as_u64(), 1042);
-assert!(InvoiceNumber::from(1u64) < InvoiceNumber::from(2u64));
+assert!(InvoiceNumber::new(1) < InvoiceNumber::new(2));
 
 // Fallible conversion from wider or signed types:
 assert!(InvoiceNumber::try_from(u128::MAX).is_err());
