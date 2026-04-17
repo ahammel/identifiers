@@ -1,0 +1,7 @@
+error: expected a struct
+ --> tests/ui/integer_not_newtype.rs:4:1
+  |
+4 | / enum BadId {
+5 | |     Variant,
+6 | | }
+  | |_^

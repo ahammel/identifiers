@@ -9,4 +9,11 @@ readme = "README.md"
 keywords = []
 categories = []
 
+[workspace]
+members = ["identifiers-derive", "identifiers-uuid", "identifiers-uri"]
+
 [dependencies]
+identifiers-derive = { path = "identifiers-derive", version = "0.1.0" }
+
+[dev-dependencies]
+trybuild = "1.0.116"
