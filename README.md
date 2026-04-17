@@ -29,7 +29,36 @@ Tests may not catch it. The wrong record gets modified in production.
 
 ## The solution
 
-Give each ID its own type. The compiler rejects wrong-order calls:
+Give each ID its own type. You can do this with plain Rust newtypes:
+
+```rust
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct UserId(String);
+
+impl UserId {
+    pub fn new(s: String) -> Result<Self, EmptyError> {
+        if s.is_empty() { return Err(EmptyError); }
+        Ok(Self(s))
+    }
+
+    pub fn as_str(&self) -> &str { &self.0 }
+}
+
+impl AsRef<str> for UserId {
+    fn as_ref(&self) -> &str { &self.0 }
+}
+
+impl TryFrom<String> for UserId {
+    type Error = EmptyError;
+    fn try_from(s: String) -> Result<Self, EmptyError> { Self::new(s) }
+}
+```
+
+That's ~20 lines per type with no guarantee that `new`, `TryFrom`, and
+`as_str` stay in sync. Multiply by every identifier in the codebase and the
+boilerplate dominates.
+
+This library generates the same code from two lines:
 
 ```rust
 use identifiers::StringIdentifier;
@@ -58,6 +87,8 @@ fn transfer_post(
 // error[E0308]: mismatched types — caught at compile time.
 transfer_post(&post_id, &org_id, &from_user, &to_user)?;
 ```
+
+No runtime overhead.
 
 ## Installation
 
