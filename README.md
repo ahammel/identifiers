@@ -259,6 +259,37 @@ struct Bad { id: String }
 struct AlsoBad(u64);
 ```
 
+## Invariant safety
+
+`#[allowed_values(non_empty)]` and `#[allowed_values(non_blank)]` provide a
+guarantee: any value of the type that exists at runtime passed the validation
+check at construction time. Callers can rely on this without re-checking.
+
+This guarantee is enforced at two levels:
+
+**At the module boundary.** Tuple struct fields are private by default in Rust,
+so code outside the defining module cannot use the tuple constructor to
+bypass `TryFrom`. The only way to produce a value from outside the module is
+through the derived `TryFrom<String>` impl, which always validates.
+
+**At the derive site.** As a safeguard against accidental `pub` field
+declarations, the derive macro rejects them at compile time:
+
+```rust
+#[derive(StringIdentifier)]
+#[allowed_values(non_empty)]
+pub struct UserId(pub String); // error: field must be private to preserve the
+                               //        non-empty/non-blank invariant
+```
+
+Within the defining module itself, the tuple constructor is still accessible
+(as it always is for private fields in Rust). This is intentional: code in the
+same module is trusted to maintain its own invariants, in the same way that
+`unsafe` blocks are trusted within the module that writes them.
+
+`#[allowed_values(all)]` makes no safety claims — it derives an infallible
+`From<String>` that accepts any input — so `pub` fields are permitted.
+
 ## License
 
 MIT

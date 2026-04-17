@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
-use syn::{parse_macro_input, Data, DeriveInput, Error, Fields, Ident};
+use syn::{parse_macro_input, Data, DeriveInput, Error, Fields, Ident, Visibility};
 
 fn require_newtype(input: &DeriveInput) -> Result<(), Error> {
     match &input.data {
@@ -14,6 +14,27 @@ fn require_newtype(input: &DeriveInput) -> Result<(), Error> {
         },
         _ => Err(Error::new_spanned(input, "expected a struct")),
     }
+}
+
+/// Rejects `pub` fields when a validated `#[allowed_values]` mode is in use.
+///
+/// A `pub` inner field lets callers bypass the conversion impl and construct
+/// the type directly with an unchecked value, undermining the invariant.
+fn require_private_field(input: &DeriveInput) -> Result<(), Error> {
+    if let Data::Struct(s) = &input.data {
+        if let Fields::Unnamed(f) = &s.fields {
+            if let Some(field) = f.unnamed.first() {
+                if matches!(field.vis, Visibility::Public(_)) {
+                    return Err(Error::new_spanned(
+                        &field.vis,
+                        "field must be private to preserve the non-empty/non-blank invariant; \
+                         remove `pub` from the field",
+                    ));
+                }
+            }
+        }
+    }
+    Ok(())
 }
 
 enum AllowedValues {
@@ -191,6 +212,13 @@ fn derive_string_identifier_inner(input: &DeriveInput) -> Result<TokenStream2, E
             fn as_ref(&self) -> &str { &self.0 }
         }
     };
+
+    if matches!(
+        mode,
+        Some(AllowedValues::NonEmpty) | Some(AllowedValues::NonBlank)
+    ) {
+        require_private_field(input)?;
+    }
 
     let (error_type, validate_body) = match &mode {
         None | Some(AllowedValues::All) => (

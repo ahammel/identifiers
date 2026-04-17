@@ -1,0 +1,5 @@
+error: field must be private to preserve the non-empty/non-blank invariant; remove `pub` from the field
+ --> tests/ui/string_pub_field.rs:5:25
+  |
+5 | struct NonEmptyPubField(pub String);
+  |                         ^^^
