@@ -103,7 +103,7 @@ checksum = "3d3067d79b975e8844ca9eb072e16b31c3c1c36928edf9c6789548c524d0d954"
 
 [[package]]
 name = "identifiers"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "identifiers-derive",
  "trybuild",
@@ -111,7 +111,7 @@ dependencies = [
 
 [[package]]
 name = "identifiers-derive"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -120,7 +120,7 @@ dependencies = [
 
 [[package]]
 name = "identifiers-uri"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "fluent-uri",
  "identifiers-derive",
@@ -129,7 +129,7 @@ dependencies = [
 
 [[package]]
 name = "identifiers-uuid"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "identifiers-derive",
  "trybuild",

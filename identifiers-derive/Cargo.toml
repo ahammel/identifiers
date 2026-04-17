@@ -1,6 +1,6 @@
 [package]
 name = "identifiers-derive"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Derive macros for the identifiers crate"
 license = "MIT"

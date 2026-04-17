@@ -1,6 +1,6 @@
 [package]
 name = "identifiers-uri"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "UriIdentifier trait and derive macro"
 license = "MIT"
@@ -11,7 +11,7 @@ categories = ["rust-patterns"]
 
 [dependencies]
 fluent-uri = "0.4.1"
-identifiers-derive = { path = "../identifiers-derive", version = "0.1.0" }
+identifiers-derive = { path = "../identifiers-derive", version = "0.1.1" }
 
 [dev-dependencies]
 trybuild = "1.0.116"

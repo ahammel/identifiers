@@ -1,6 +1,6 @@
 [package]
 name = "identifiers-uuid"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "UuidIdentifier trait and derive macro"
 license = "MIT"
@@ -10,7 +10,7 @@ keywords = ["identifier", "newtype", "typesafe", "derive", "uuid"]
 categories = ["rust-patterns"]
 
 [dependencies]
-identifiers-derive = { path = "../identifiers-derive", version = "0.1.0" }
+identifiers-derive = { path = "../identifiers-derive", version = "0.1.1" }
 uuid = { version = "1", features = ["v4"] }
 
 [dev-dependencies]
